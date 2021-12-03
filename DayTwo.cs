@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Advent_of_Code_2021 {
-	internal class DayTwo {
+	internal static class DayTwo {
 		enum Direction {
 			forward,down,up
 		}
