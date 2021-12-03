@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Advent_of_Code_2021 {
-	internal class DayOne {
+	internal static class DayOne {
 		internal static long Part1(string input) {
 			string[] lines = input.Split('\n');
 			int last = -1;

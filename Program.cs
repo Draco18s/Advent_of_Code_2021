@@ -13,21 +13,21 @@ using System.Threading.Tasks;
 namespace Advent_of_Code_2021 {
 	static class Program {
 		static void Main(string[] args) {
-			string input = File.ReadAllText(Path.GetFullPath("../../inputs/Day2.txt"));
+			string input = File.ReadAllText(Path.GetFullPath("../../inputs/Day3.txt"));
 			input = input.Replace("\r", "");
 			//string input = @"";
 			DateTime s = DateTime.Now;
-			long result = DayTwo.Part1(input);
+			long result = DayThree.Part1(input);
 			DateTime e = DateTime.Now;
 			Console.WriteLine(result);
 			Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
 			s = DateTime.Now;
-			result = DayTwo.Part2(input);
+			result = DayThree.Part2(input);
 			e = DateTime.Now;
 			Console.WriteLine(result);
 			Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
-			Console.ReadKey();
-			BuildLeaderboard();
+			//Console.ReadKey();
+			//BuildLeaderboard();
 			Console.ReadKey();
 		}
 
