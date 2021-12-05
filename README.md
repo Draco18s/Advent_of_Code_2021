@@ -5,6 +5,7 @@ https://adventofcode.com/2021/
 ```
       --------Part 1--------   --------Part 2--------
 Day       Time   Rank  Score       Time   Rank  Score
+  5   00:38:14   5202      0   00:52:37   4451      0
   4   20:21:45  50597      0   20:35:20  47068      0
   3   00:05:56    875      0   00:21:52   1185      0
   2   00:05:21   3464      0   00:06:54   2109      0
@@ -14,3 +15,5 @@ Day       Time   Rank  Score       Time   Rank  Score
 *Started late on day 1...as usual...*
 
 *Started late on day 4 due to travel*
+
+*Day 5 all of the little things*

@@ -13,14 +13,9 @@ namespace Advent_of_Code_2020.StatsBuilder {
 		public long get_star_ts { get; set; }
 
 		public static DateTime UnixTimeStampToDateTime(double unixTimeStamp) {
-			var timeUtc = DateTime.UtcNow;
-
-			// Unix timestamp is seconds past epoch
 			DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-			TimeZoneInfo easternZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
 			dtDateTime = dtDateTime.AddSeconds(unixTimeStamp);
-			dtDateTime = TimeZoneInfo.ConvertTimeFromUtc(dtDateTime, easternZone);
-			return dtDateTime;
+			return dtDateTime.ToLocalTime();
 		}
 	}
 }
