@@ -18,3 +18,6 @@ Day       Time   Rank  Score       Time   Rank  Score
 *Started late on day 4 due to travel*
 
 *Day 5 all of the little things*
+
+*Day 7 site wigged out and I locked myself out of answering part 2 because I thought it hadn't taken my answer for part 1.*
+*Site did wig out, cannot fetch personal stats.*
