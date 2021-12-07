@@ -17,17 +17,17 @@ namespace Advent_of_Code_2021 {
 		private const string leaderboardURI = "{0}/leaderboard/private/view/{1}.json";
 
 		static void Main(string[] args) {
-			string p =Path.GetFullPath("./inputs/day6.txt");
+			string p =Path.GetFullPath("./inputs/day7.txt");
 			string input = File.ReadAllText(p);
 			input = input.Replace("\r", "");
 			//string input = @"";
 			DateTime s = DateTime.Now;
-			long result = DaySix.Part1(input);
+			long result = DaySeven.Part1(input);
 			DateTime e = DateTime.Now;
 			Console.WriteLine(result);
 			Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
 			s = DateTime.Now;
-			result = DaySix.Part2(input);
+			result = DaySeven.Part2(input);
 			e = DateTime.Now;
 			Console.WriteLine(result);
 			Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
