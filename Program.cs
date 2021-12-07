@@ -12,53 +12,51 @@ using System.Threading.Tasks;
 
 namespace Advent_of_Code_2021 {
 	static class Program {
+		private const string year = "2021";
+		private static readonly Uri baseAddress = new Uri("https://adventofcode.com");
+		private const string leaderboardURI = "{0}/leaderboard/private/view/{1}.json";
+
 		static void Main(string[] args) {
-			string input = File.ReadAllText(Path.GetFullPath("../../inputs/Day3.txt"));
+			string p =Path.GetFullPath("./inputs/day6.txt");
+			string input = File.ReadAllText(p);
 			input = input.Replace("\r", "");
 			//string input = @"";
 			DateTime s = DateTime.Now;
-			long result = DayThree.Part1(input);
+			long result = DaySix.Part1(input);
 			DateTime e = DateTime.Now;
 			Console.WriteLine(result);
 			Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
 			s = DateTime.Now;
-			result = DayThree.Part2(input);
+			result = DaySix.Part2(input);
 			e = DateTime.Now;
 			Console.WriteLine(result);
 			Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
 			//Console.ReadKey();
-			//BuildLeaderboard();
-			Console.ReadKey();
+			BuildLeaderboard();
+			Console.Read();
+			//Console.ReadKey();
 		}
 
 		static void BuildLeaderboard() {
-			string leaderboard = ""; //TODO: leaderboard json
+			string confj = File.ReadAllText(Path.GetFullPath("./inputs/config.json"));
+			Dictionary<string,List<string>> conf = JsonSerializer.Deserialize<Dictionary<string,List<string>>>(confj);
+			
 			Task.Run(async () => {
-				string input = await GetFromAsync(leaderboard);
 				AoCLeaderboard obj;
-				try {
-					obj = JsonSerializer.Deserialize<AoCLeaderboard>(input);
-				}
-				catch (Exception ex) {
-					Console.WriteLine(ex.Message);
-					return;
-				}
 				List<AoCUser> users = new List<AoCUser>();
-				foreach(AoCUser u in obj.members.Values) {
-					if(u.name == null) {
-						u.name = "(anonymous user #" + u.id + ")";
+				foreach(string k in conf.Keys) {
+					List<string> boards = conf[k];
+					foreach(string b in boards) {
+						string input = await GetFromAsync(string.Format(leaderboardURI,year,b), k);
+						obj = JsonSerializer.Deserialize<AoCLeaderboard>(input);
+						foreach(AoCUser u in obj.members.Values) {
+							if(u.name == null) {
+								u.name = "(anonymous user #" + u.id + ")";
+							}
+							if(u.id.Equals("1081403") || users.Contains(u)) continue;
+							users.Add(u);
+						}
 					}
-					users.Add(u);
-				}
-				leaderboard = "";
-				input = await GetFromAsync(leaderboard);
-				obj = JsonSerializer.Deserialize<AoCLeaderboard>(input);
-				foreach(AoCUser u in obj.members.Values) {
-					if(u.name == null) {
-						u.name = "(anonymous user #" + u.id + ")";
-					}
-					if(users.Contains(u)) continue;
-					users.Add(u);
 				}
 
 				string mainTable = "<table> <tbody> <tr> <td class=\"typeheader\" colspan=\"3\">(25 items)<span class=\"fixedextenser\">4</span></td></tr><tr> <th title=\"System.String\">day</th> <th title=\"System.String,System.DateTime,System.Int32[]\">silver_order</th> <th title=\"System.String,System.DateTime,System.Int32[]\">gold_order</th> </tr>{0}</tbody></table>";
@@ -68,20 +66,19 @@ namespace Advent_of_Code_2021 {
 					builder.Append(GetTableRow(users, d));
 				}
 				builder.Append(GetTableRowScores(users));
-				input = File.ReadAllText(Path.GetFullPath("../../inputs/leaderboard_html.txt"));
-				input = input.Replace("{", "{{").Replace("}", "}}").Replace("{{0}}", "{0}");
-				if(File.Exists(Path.GetFullPath("../../leaderboard.html"))) {
-					File.Delete(Path.GetFullPath("../../leaderboard.html"));
+				string htmlTemplate = File.ReadAllText(Path.GetFullPath("inputs/leaderboard_html.txt"));
+				htmlTemplate = htmlTemplate.Replace("{", "{{").Replace("}", "}}").Replace("{{0}}", "{0}");
+				if(File.Exists(Path.GetFullPath("leaderboard.html"))) {
+					File.Delete(Path.GetFullPath("leaderboard.html"));
 				}
-				File.WriteAllText(Path.GetFullPath("../../leaderboard.html"), string.Format(input, string.Format(mainTable, builder.ToString())));
+				File.WriteAllText(Path.GetFullPath("leaderboard.html"), string.Format(htmlTemplate, string.Format(mainTable, builder.ToString())));
 			});
 		}
 
-		private static async Task<string> GetFromAsync(string jsonurl) {
-			var baseAddress = new Uri("https://adventofcode.com");
+		private static async Task<string> GetFromAsync(string jsonurl, string sessionID) {
 			var url = new Uri(baseAddress + jsonurl);
 			var cookieContainer = new CookieContainer();
-			cookieContainer.Add(baseAddress, new Cookie("session", "00000")); //TODO: Config file
+			cookieContainer.Add(baseAddress, new Cookie("session", sessionID));
 
 			HttpClient httpClient = new HttpClient(
 				new HttpClientHandler {
@@ -108,7 +105,7 @@ namespace Advent_of_Code_2021 {
 				SortUsers(ref users, day, part);
 				foreach(AoCUser user in users) {
 					int pts = GetPointsForUser(ref users, user.id, day, part);
-					if(d > 1)
+					if(d > 0)
 						user.locPoints += pts;
 					parts[p - 1] += GetUserLineScore(user, day, part, pts);
 				}
