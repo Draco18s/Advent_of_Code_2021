@@ -15,32 +15,43 @@ namespace Advent_of_Code_2021 {
 		private const string year = "2021";
 		private static readonly Uri baseAddress = new Uri("https://adventofcode.com");
 		private const string leaderboardURI = "{0}/leaderboard/private/view/{1}.json";
+		private static Dictionary<string,List<string>> conf;
 
 		static void Main(string[] args) {
-			string p =Path.GetFullPath("./inputs/day7.txt");
-			string input = File.ReadAllText(p);
-			input = input.Replace("\r", "");
-			//string input = @"";
-			DateTime s = DateTime.Now;
-			long result = DaySeven.Part1(input);
-			DateTime e = DateTime.Now;
-			Console.WriteLine(result);
-			Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
-			s = DateTime.Now;
-			result = DaySeven.Part2(input);
-			e = DateTime.Now;
-			Console.WriteLine(result);
-			Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
-			//Console.ReadKey();
-			BuildLeaderboard();
+			string confj = File.ReadAllText(Path.GetFullPath("./inputs/config.json"));
+			conf = JsonSerializer.Deserialize<Dictionary<string,List<string>>>(confj);
+
+			string day = "8";
+			string p = Path.GetFullPath(string.Format("./inputs/day{0}.txt", day));
+			if(!File.Exists(p)) {
+				Task.Run(async () => {
+					string puzzleInput = await GetInputFor(day, conf.Keys.First());
+					File.WriteAllText(p, puzzleInput);
+					Main(args);
+				});
+			}
+			else {
+				string input = File.ReadAllText(p);
+				input = input.Replace("\r", "");
+				//string input = @"";
+				DateTime s = DateTime.Now;
+				long result = DayEight.Part1(input);
+				DateTime e = DateTime.Now;
+				Console.WriteLine(result);
+				Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
+				s = DateTime.Now;
+				result = DayEight.Part2(input);
+				e = DateTime.Now;
+				Console.WriteLine(result);
+				Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
+				//Console.ReadKey();
+				//BuildLeaderboard();
+				//Console.ReadKey();
+			}
 			Console.Read();
-			//Console.ReadKey();
 		}
 
 		static void BuildLeaderboard() {
-			string confj = File.ReadAllText(Path.GetFullPath("./inputs/config.json"));
-			Dictionary<string,List<string>> conf = JsonSerializer.Deserialize<Dictionary<string,List<string>>>(confj);
-			
 			Task.Run(async () => {
 				AoCLeaderboard obj;
 				List<AoCUser> users = new List<AoCUser>();
@@ -68,15 +79,36 @@ namespace Advent_of_Code_2021 {
 				builder.Append(GetTableRowScores(users));
 				string htmlTemplate = File.ReadAllText(Path.GetFullPath("inputs/leaderboard_html.txt"));
 				htmlTemplate = htmlTemplate.Replace("{", "{{").Replace("}", "}}").Replace("{{0}}", "{0}");
-				if(File.Exists(Path.GetFullPath("leaderboard.html"))) {
-					File.Delete(Path.GetFullPath("leaderboard.html"));
+				string outputFile = Path.GetFullPath("leaderboard.html");
+				if(File.Exists(outputFile)) {
+					File.Delete(outputFile);
 				}
-				File.WriteAllText(Path.GetFullPath("leaderboard.html"), string.Format(htmlTemplate, string.Format(mainTable, builder.ToString())));
+				File.WriteAllText(outputFile, string.Format(htmlTemplate, string.Format(mainTable, builder.ToString())));
 			});
 		}
 
+		private static async Task<string> GetInputFor(string day, string sessionID) {
+			//var url = new Uri(baseAddress + jsonurl);
+			var jsonurl = string.Format("{0}{1}/day/{2}/input", baseAddress, year, day);
+			var cookieContainer = new CookieContainer();
+			cookieContainer.Add(baseAddress, new Cookie("session", sessionID));
+
+			HttpClient httpClient = new HttpClient(
+				new HttpClientHandler {
+					CookieContainer = cookieContainer,
+					AutomaticDecompression = DecompressionMethods.Deflate|DecompressionMethods.GZip,
+				}) {
+				BaseAddress = baseAddress,
+			};
+			var response = await httpClient.GetAsync(jsonurl);
+			if(response.IsSuccessStatusCode) {
+				return await response.Content.ReadAsStringAsync();
+			}
+			return string.Empty;
+		}
+
 		private static async Task<string> GetFromAsync(string jsonurl, string sessionID) {
-			var url = new Uri(baseAddress + jsonurl);
+			//var url = new Uri(baseAddress + jsonurl);
 			var cookieContainer = new CookieContainer();
 			cookieContainer.Add(baseAddress, new Cookie("session", sessionID));
 
