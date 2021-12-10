@@ -5,6 +5,8 @@ https://adventofcode.com/2021/
 ```
       --------Part 1--------   --------Part 2--------
 Day       Time   Rank  Score       Time   Rank  Score
+ 10   00:09:04   1259      0   00:18:28   1485      0
+  9   00:12:11   2387      0   00:25:56   1379      0
   8   00:05:58    472      0   00:55:48   1802      0
   7   00:22:16   8470      0   00:35:27   8359      0
   6   00:10:10   3132      0   00:20:16   2040      0
@@ -22,4 +24,4 @@ Day       Time   Rank  Score       Time   Rank  Score
 *Day 5 all of the little things*
 
 *Day 7 site wigged out and I locked myself out of answering part 2 because I thought it hadn't taken my answer for part 1.*
-*Site did wig out, cannot fetch personal stats.*
+*Site did wig out, could not fetch personal stats.*

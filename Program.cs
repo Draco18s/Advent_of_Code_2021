@@ -16,16 +16,17 @@ namespace Advent_of_Code_2021 {
 		private static readonly Uri baseAddress = new Uri("https://adventofcode.com");
 		private const string leaderboardURI = "{0}/leaderboard/private/view/{1}.json";
 		private static Dictionary<string,List<string>> conf;
+		
+		private static string puzzleNum = "11";
 
 		static void Main(string[] args) {
 			string confj = File.ReadAllText(Path.GetFullPath("./inputs/config.json"));
 			conf = JsonSerializer.Deserialize<Dictionary<string,List<string>>>(confj);
 
-			string day = "8";
-			string p = Path.GetFullPath(string.Format("./inputs/day{0}.txt", day));
+			string p = Path.GetFullPath(string.Format("./inputs/day{0}.txt", puzzleNum));
 			if(!File.Exists(p)) {
 				Task.Run(async () => {
-					string puzzleInput = await GetInputFor(day, conf.Keys.First());
+					string puzzleInput = await GetInputFor(puzzleNum, conf.Keys.First());
 					File.WriteAllText(p, puzzleInput);
 					Main(args);
 				});
@@ -33,19 +34,21 @@ namespace Advent_of_Code_2021 {
 			else {
 				string input = File.ReadAllText(p);
 				input = input.Replace("\r", "");
+				if(input[input.Length - 1] == '\n')
+					input = input.Substring(0, input.Length - 1); //stupid trailing newline
 				//string input = @"";
 				DateTime s = DateTime.Now;
-				long result = DayEight.Part1(input);
+				long result = DayOne.Part1(input);
 				DateTime e = DateTime.Now;
 				Console.WriteLine(result);
 				Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
 				s = DateTime.Now;
-				result = DayEight.Part2(input);
+				result = DayOne.Part2(input);
 				e = DateTime.Now;
 				Console.WriteLine(result);
 				Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
 				//Console.ReadKey();
-				//BuildLeaderboard();
+				BuildLeaderboard();
 				//Console.ReadKey();
 			}
 			Console.Read();
