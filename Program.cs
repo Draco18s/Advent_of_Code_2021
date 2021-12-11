@@ -38,12 +38,12 @@ namespace Advent_of_Code_2021 {
 					input = input.Substring(0, input.Length - 1); //stupid trailing newline
 				//string input = @"";
 				DateTime s = DateTime.Now;
-				long result = DayOne.Part1(input);
+				long result = DayEleven.Part1(input);
 				DateTime e = DateTime.Now;
 				Console.WriteLine(result);
 				Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
 				s = DateTime.Now;
-				result = DayOne.Part2(input);
+				result = DayEleven.Part2(input);
 				e = DateTime.Now;
 				Console.WriteLine(result);
 				Console.WriteLine("Time: " + (e - s).TotalMilliseconds);

@@ -5,6 +5,7 @@ https://adventofcode.com/2021/
 ```
       --------Part 1--------   --------Part 2--------
 Day       Time   Rank  Score       Time   Rank  Score
+ 11   00:26:40   2131      0   00:28:31   1895      0
  10   00:09:04   1259      0   00:18:28   1485      0
   9   00:12:11   2387      0   00:25:56   1379      0
   8   00:05:58    472      0   00:55:48   1802      0
@@ -25,3 +26,5 @@ Day       Time   Rank  Score       Time   Rank  Score
 
 *Day 7 site wigged out and I locked myself out of answering part 2 because I thought it hadn't taken my answer for part 1.*
 *Site did wig out, could not fetch personal stats.*
+
+*Day 11: beat both Stevie-O and Keith
