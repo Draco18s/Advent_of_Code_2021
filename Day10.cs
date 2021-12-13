@@ -63,7 +63,6 @@ namespace Advent_of_Code_2021 {
 
 		internal static long Part2(string input) {
 			string[] lines = input.Split('\n');
-			long result = 1;
 			Dictionary<char,int> points = new Dictionary<char,int>();
 			points.Add(')',1);
 			points.Add(']',2);

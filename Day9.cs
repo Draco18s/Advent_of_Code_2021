@@ -46,7 +46,6 @@ namespace Advent_of_Code_2021 {
 
 		internal static long Part2(string input) {
 			string[] lines = input.Split('\n');
-			long result = 1;
 			int[,] grid = new int[lines[0].Length,lines.Length];
 			{
 				int y = 0;
