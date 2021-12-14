@@ -26,7 +26,6 @@ namespace Advent_of_Code_2021 {
 
 		internal static long Part1(string input) {
 			string[] lines = input.Split('\n');
-			long result = 0;
 			bool dots = true;
 			List<Vec2> points = new List<Vec2>();
 			List<Fold> folds = new List<Fold>();
