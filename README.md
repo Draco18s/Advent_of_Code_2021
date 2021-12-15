@@ -5,6 +5,7 @@ https://adventofcode.com/2021/
 ```
       --------Part 1--------   --------Part 2--------
 Day       Time   Rank  Score       Time   Rank  Score
+ 15   00:32:42   2210      0   02:26:57   4678      0
  14   00:10:10    858      0   00:30:41    982      0
  13   00:18:54   1608      0   00:21:49   1065      0
  12   00:39:52   3606      0   01:33:10   4982      0
@@ -35,3 +36,5 @@ Day       Time   Rank  Score       Time   Rank  Score
 *Day 12: stupidly kept track of all paths found, rather than just counting them.*
 
 *Day 11: beat both Stevie-O and Keith*
+
+*Day 15: part 2 required four attempts before computing the total cost to reach every tile. Gross. Execution time: 12.340 seconds.*
