@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Draco18s.AoCLib;
 
 namespace Advent_of_Code_2021 {
 	static class Program {
@@ -17,7 +18,7 @@ namespace Advent_of_Code_2021 {
 		private const string leaderboardURI = "{0}/leaderboard/private/view/{1}.json";
 		private static Dictionary<string,List<string>> conf;
 		
-		private static string puzzleNum = "15";
+		private static string puzzleNum = "16";
 
 		static void Main(string[] args) {
 			string confj = File.ReadAllText(Path.GetFullPath("./inputs/config.json"));
@@ -38,12 +39,12 @@ namespace Advent_of_Code_2021 {
 					input = input.Substring(0, input.Length - 1); //stupid trailing newline
 				//string input = @"";
 				DateTime s = DateTime.Now;
-				long result = DayFifteen.Part1(input);
+				long result = DaySixteen.Part1(input);
 				DateTime e = DateTime.Now;
 				Console.WriteLine(result);
 				Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
 				s = DateTime.Now;
-				result = DayFifteen.Part2(input);
+				result = DaySixteen.Part2(input);
 				e = DateTime.Now;
 				Console.WriteLine(result);
 				Console.WriteLine("Time: " + (e - s).TotalMilliseconds);
@@ -51,6 +52,14 @@ namespace Advent_of_Code_2021 {
 				//BuildLeaderboard();
 				//Console.ReadKey();
 			}
+			/*string inp = @"2199943210
+3987894921
+9856789892
+8767896789
+9899965678";
+			Grid g = new Grid(inp);
+			long v = g.FloodFill(1,0,9, (n,c) => n > c);
+			Console.WriteLine(v);*/
 			Console.Read();
 		}
 
