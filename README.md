@@ -5,6 +5,7 @@ https://adventofcode.com/2021/
 ```
       --------Part 1--------   --------Part 2--------
 Day       Time   Rank  Score       Time   Rank  Score
+ 18   01:46:45   1335      0   01:55:47   1317      0
  17   01:08:59   4446      0   01:39:25   4492      0
  16   00:34:22    556      0   00:40:44    457      0
  15   00:32:42   2210      0   02:26:57   4678      0
@@ -42,3 +43,5 @@ Day       Time   Rank  Score       Time   Rank  Score
 *Day 15: part 2 required four attempts before computing the total cost to reach every tile. Gross. Execution time: 12.340 seconds.*
 
 *Day 17: tore out my hair trying to figure out why my regex wasn't working. I was feeding it day 16's input. Did not find the elegant solution to part 1.*
+
+*Day 18: Explode() was the puzzle. I had numerous bugs that took some time working through step by step with different examples until locating the error.*
