@@ -5,6 +5,8 @@ https://adventofcode.com/2021/
 ```
       --------Part 1--------   --------Part 2--------
 Day       Time   Rank  Score       Time   Rank  Score
+ 20   00:35:39    964      0   00:38:19    853      0
+ 19   23:25:42   8457      0   26:49:01   8539      0	>24h
  18   01:46:45   1335      0   01:55:47   1317      0
  17   01:08:59   4446      0   01:39:25   4492      0
  16   00:34:22    556      0   00:40:44    457      0
@@ -45,3 +47,5 @@ Day       Time   Rank  Score       Time   Rank  Score
 *Day 17: tore out my hair trying to figure out why my regex wasn't working. I was feeding it day 16's input. Did not find the elegant solution to part 1.*
 
 *Day 18: Explode() was the puzzle. I had numerous bugs that took some time working through step by step with different examples until locating the error.*
+
+*Day 19: A harder variant of the sea monster puzzle from last year. Takes about 22 minutes to execute part 1. Part 2 is almost the exact same code, just tracks a different value.*
