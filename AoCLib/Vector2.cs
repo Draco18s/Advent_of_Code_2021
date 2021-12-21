@@ -8,5 +8,9 @@ namespace Draco18s.AoCLib {
 			x = _x;
 			y = _y;
 		}
+
+		public override string ToString() {
+			return string.Format("({0},{1})", x, y);
+		}
 	}
 }
