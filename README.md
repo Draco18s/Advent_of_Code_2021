@@ -5,7 +5,7 @@ https://adventofcode.com/2021/
 ```
       --------Part 1--------   --------Part 2--------
 Day       Time   Rank  Score       Time   Rank  Score
- 23   00:15:58    125      0          -      -      -
+ 23   00:15:58    125      0   17:18:47   5694      0
  22   00:14:41   1060      0          -      -      -
  21   00:11:50    946      0   02:47:07   3465      0
  20   00:35:39    964      0   00:38:19    853      0
@@ -54,3 +54,5 @@ Day       Time   Rank  Score       Time   Rank  Score
 *Day 19: A harder variant of the sea monster puzzle from last year. Takes about 22 minutes to execute part 1. Part 2 is almost the exact same code, just tracks a different value.*
 
 *Day 21: Struggled a bit with part 2 and universe-splitting dice. Primary problem turned out to be that I was inadvertantly scoring 9 times for every turn, creating 9 times too many universes (so, too many)*
+
+*Day 23: I hecking solved part 2 **BY HAND** and miscounted steps and got the wrong sum. Several times. :(*
