@@ -11,6 +11,7 @@ namespace Advent_of_Code_2021 {
 	internal static class DayTwentytwo {
 		
 		internal static long Part1(string input) {
+			//return 0;
 			string[] lines = input.Split('\n');
 			Grid3D reactor = new Grid3D(101,101,101,-50,-50,-50);
 			int minimum = 9;
@@ -52,45 +53,6 @@ namespace Advent_of_Code_2021 {
 			}
 			return numOn;
 		}
-
-		/*internal static long Part2(string input) {
-			(Vector3,Vector3) B = (new Vector3(0,0,0), new Vector3(10,10,10));
-			(Vector3,Vector3) A = (new Vector3(2,8,-2), new Vector3(8,12,2));
-			List<(Vector3,Vector3)> newRegions = Split(A, B, true);
-			List<(Vector3,Vector3)> newRegionsAdj = new List<(Vector3,Vector3)>();
-			foreach((Vector3,Vector3) a in newRegions) {
-				newRegionsAdj.Add((
-					new Vector3(Math.Min(a.Item1.x,a.Item2.x),Math.Min(a.Item1.y,a.Item2.y),Math.Min(a.Item1.z,a.Item2.z)),
-					new Vector3(Math.Max(a.Item1.x,a.Item2.x),Math.Max(a.Item1.y,a.Item2.y),Math.Max(a.Item1.z,a.Item2.z))
-				));
-			}
-			List<(Vector3,Vector3)> ff = new List<(Vector3,Vector3)>();
-			ff.AddRange(newRegionsAdj.Select(a=>a).Where(a => newRegionsAdj.Any(b=> ShareFaceX(a, b))));
-			ff.AddRange(newRegionsAdj.Select(a=>a).Where(a => newRegionsAdj.Any(b=> ShareFaceY(a, b))));
-			ff.AddRange(newRegionsAdj.Select(a=>a).Where(a => newRegionsAdj.Any(b=> ShareFaceZ(a, b))));
-			foreach((Vector3, Vector3) r1 in ff) {
-				if(!newRegionsAdj.Contains(r1)) continue;
-				if(newRegionsAdj.Any(b=> ShareFaceZ(r1, b))) {
-					(Vector3, Vector3) r2 = newRegionsAdj.Select(a=>a).Where(b=> ShareFaceX(r1, b)).First();
-					newRegionsAdj.Remove(r1);
-					newRegionsAdj.Remove(r2);
-					newRegionsAdj.Add((new Vector3(r1.Item1.x, r1.Item1.y, Math.Min(r1.Item1.z,r2.Item1.z)),new Vector3(r1.Item1.x, r1.Item1.y, Math.Max(r1.Item2.z,r2.Item2.z))));
-				}
-				if(newRegionsAdj.Any(b=> ShareFaceY(r1, b))) {
-					(Vector3, Vector3) r2 = newRegionsAdj.Select(a=>a).Where(b=> ShareFaceY(r1, b)).First();
-					newRegionsAdj.Remove(r1);
-					newRegionsAdj.Remove(r2);
-					newRegionsAdj.Add((new Vector3(r1.Item1.x, Math.Min(r1.Item1.y,r2.Item1.y), r1.Item1.z),new Vector3(r1.Item1.x, Math.Max(r1.Item2.y,r2.Item2.y), r1.Item1.z)));
-				}
-				if(newRegionsAdj.Any(b=> ShareFaceX(r1, b))) {
-					(Vector3, Vector3) r2 = newRegionsAdj.Select(a=>a).Where(b=> ShareFaceX(r1, b)).First();
-					newRegionsAdj.Remove(r1);
-					newRegionsAdj.Remove(r2);
-					newRegionsAdj.Add((new Vector3(Math.Min(r1.Item1.x,r2.Item1.x), r1.Item1.y, r1.Item1.z),new Vector3(Math.Max(r1.Item2.x,r2.Item2.x), r1.Item1.x, r1.Item1.z)));
-				}
-			}
-			return 0;
-		}*/
 		
 		internal static long Part2(string input) {
 			string[] lines = input.Split('\n');
@@ -114,51 +76,98 @@ namespace Advent_of_Code_2021 {
 				instructions.Add((turnOn, cube));
 			}
 			List<(Vector3,Vector3)> onRegions = new List<(Vector3,Vector3)>();
+			bool good;
 			foreach((bool,(Vector3,Vector3)) instruc in instructions) {
-				List<(Vector3,Vector3)> overlaps = onRegions.Select(a=>a).Where(a => ComputeDoesOverlap(a, instruc.Item2) > 0).ToList();
+				List<(Vector3,Vector3)> overlaps = onRegions.Select(a=>a).Where(a => ComputeDoesOverlap(a, instruc.Item2) >= 0).ToList();
 				if(overlaps.Count == 0 && instruc.Item1) {
 					onRegions.Add(instruc.Item2);
 					continue;
 				}
-				foreach((Vector3,Vector3) overl in overlaps) {
-					onRegions.Remove(overl);
-					List<(Vector3,Vector3)> newRegions = Split(overl, instruc.Item2, instruc.Item1);
-					List<(Vector3,Vector3)> newRegionsAdj = new List<(Vector3,Vector3)>();
-					foreach((Vector3,Vector3) a in newRegions) {
-						newRegionsAdj.Add((
-							new Vector3(Math.Min(a.Item1.x,a.Item2.x),Math.Min(a.Item1.y,a.Item2.y),Math.Min(a.Item1.z,a.Item2.z)),
-							new Vector3(Math.Max(a.Item1.x,a.Item2.x),Math.Max(a.Item1.y,a.Item2.y),Math.Max(a.Item1.z,a.Item2.z))
-						));
+				
+				if(instruc.Item1) {
+					//remove all overlap from instruc
+					List<(Vector3,Vector3)> subRegionsA = new List<(Vector3,Vector3)>();
+					List<(Vector3,Vector3)> subRegionsB = new List<(Vector3,Vector3)>();
+					subRegionsA.Add(instruc.Item2);
+					foreach((Vector3,Vector3) overl in overlaps) {
+						while(subRegionsA.Count > 0) {
+							(Vector3,Vector3) inst = subRegionsA[0];
+							subRegionsA.RemoveAt(0);
+							if(ComputeDoesOverlap(inst, overl) < 0) {
+								//no overlap, just move it over
+								subRegionsB.Add(inst);
+								continue;
+							}
+							subRegionsB.AddRange(Split(inst, overl, false));
+
+							while(subRegionsB.Select(a=>a).Where(a => subRegionsB.Any(b=> a!=b && ComputeDoesOverlap(a, b) >= 0)).Any()) {
+								var fff = subRegionsB.Select(a=>a).Where(a => subRegionsB.Any(b=> a!=b && ComputeDoesOverlap(a, b) >= 0)).ToList();
+								var ggg = subRegionsB.Select(a=>a).Where(a => a!=fff[0] && ComputeDoesOverlap(a, fff[0]) >= 0).ToList();
+								subRegionsB.Remove(ggg[0]);
+								subRegionsB.AddRange(Split(ggg[0], fff[0], false));
+							}
+						}
+						subRegionsA = subRegionsB;
+						subRegionsB = new List<(Vector3,Vector3)>();
 					}
-					List<(Vector3,Vector3)> ff = new List<(Vector3,Vector3)>();
-					ff.AddRange(newRegionsAdj.Select(a=>a).Where(a => newRegionsAdj.Any(b=> ShareFaceX(a, b))));
-					ff.AddRange(newRegionsAdj.Select(a=>a).Where(a => newRegionsAdj.Any(b=> ShareFaceY(a, b))));
-					ff.AddRange(newRegionsAdj.Select(a=>a).Where(a => newRegionsAdj.Any(b=> ShareFaceZ(a, b))));
-					foreach((Vector3, Vector3) r1 in ff) {
-						if(!newRegionsAdj.Contains(r1)) continue;
-						if(newRegionsAdj.Any(b=> ShareFaceZ(r1, b))) {
-							(Vector3, Vector3) r2 = newRegionsAdj.Select(a=>a).Where(b=> ShareFaceZ(r1, b)).First();
-							newRegionsAdj.Remove(r1);
-							newRegionsAdj.Remove(r2);
-							newRegionsAdj.Add((new Vector3(r1.Item1.x, r1.Item1.y, Math.Min(r1.Item1.z,r2.Item1.z)),new Vector3(r1.Item1.x, r1.Item1.y, Math.Max(r1.Item2.z,r2.Item2.z))));
+					onRegions.AddRange(MergeResults(subRegionsA));
+				}
+				else {
+					;
+					//remove instruct from all overlaps
+					List<(Vector3,Vector3)> newRegions;
+					foreach((Vector3,Vector3) overl in overlaps) {
+						onRegions.Remove(overl);
+						newRegions = Split(overl, instruc.Item2, instruc.Item1);
+						while(newRegions.Select(a=>a).Where(a => newRegions.Any(b=> a!=b && ComputeDoesOverlap(a, b) >= 0)).Any()) {
+							var fff = newRegions.Select(a=>a).Where(a => newRegions.Any(b=> a!=b && ComputeDoesOverlap(a, b) >= 0)).ToList();
+							var ggg = newRegions.Select(a=>a).Where(a => a!=fff[0] && ComputeDoesOverlap(a, fff[0]) >= 0).ToList();
+							newRegions.Remove(ggg[0]);
+							newRegions.AddRange(Split(ggg[0], fff[0], false));
 						}
-						if(newRegionsAdj.Any(b=> ShareFaceY(r1, b))) {
-							(Vector3, Vector3) r2 = newRegionsAdj.Select(a=>a).Where(b=> ShareFaceY(r1, b)).First();
-							newRegionsAdj.Remove(r1);
-							newRegionsAdj.Remove(r2);
-							newRegionsAdj.Add((new Vector3(r1.Item1.x, Math.Min(r1.Item1.y,r2.Item1.y), r1.Item1.z),new Vector3(r1.Item1.x, Math.Max(r1.Item2.y,r2.Item2.y), r1.Item1.z)));
-						}
-						if(newRegionsAdj.Any(b=> ShareFaceX(r1, b))) {
-							(Vector3, Vector3) r2 = newRegionsAdj.Select(a=>a).Where(b=> ShareFaceX(r1, b)).First();
-							newRegionsAdj.Remove(r1);
-							newRegionsAdj.Remove(r2);
-							newRegionsAdj.Add((new Vector3(Math.Min(r1.Item1.x,r2.Item1.x), r1.Item1.y, r1.Item1.z),new Vector3(Math.Max(r1.Item2.x,r2.Item2.x), r1.Item1.x, r1.Item1.z)));
-						}
+						onRegions.AddRange(MergeResults(newRegions));
 					}
-					onRegions.AddRange(newRegionsAdj);
 				}
 			}
+			foreach((Vector3, Vector3) r in onRegions) {
+				finalResult += GetVolume(r);
+			}
 			return finalResult;
+		}
+
+		private static List<(Vector3,Vector3)> MergeResults(List<(Vector3,Vector3)> newRegions) {
+			bool good = !newRegions.Select(a=>a).Where(a => newRegions.Any(b=> a!=b && ComputeDoesOverlap(a, b) >= 0)).Any();
+			List<(Vector3,Vector3)> newRegionsAdj = new List<(Vector3,Vector3)>(newRegions);
+			List<(Vector3,Vector3)> ff = new List<(Vector3,Vector3)>();
+			ff.AddRange(newRegionsAdj.Select(a=>a).Where(a => newRegionsAdj.Any(b=> a!=b&&ShareFaceX(a, b))));
+			ff.AddRange(newRegionsAdj.Select(a=>a).Where(a => newRegionsAdj.Any(b=> a!=b&&ShareFaceY(a, b))));
+			ff.AddRange(newRegionsAdj.Select(a=>a).Where(a => newRegionsAdj.Any(b=> a!=b&&ShareFaceZ(a, b))));
+			(Vector3, Vector3) r2last = (new Vector3(0,0,0),new Vector3(0,0,0));
+			foreach((Vector3, Vector3) r1 in ff) {
+				if(!newRegionsAdj.Contains(r1)) continue;
+				if(newRegionsAdj.Any(b=> r1!=b&&ShareFaceZ(r1, b))) {
+					(Vector3, Vector3) r2 = newRegionsAdj.Select(a=>a).Where(b=> r1!=b&&ShareFaceZ(r1, b)).First();
+					newRegionsAdj.Remove(r1);
+					newRegionsAdj.Remove(r2);
+					r2last = r2;
+					newRegionsAdj.Add((new Vector3(r1.Item1.x, r1.Item1.y, Math.Min(r1.Item1.z,r2.Item1.z)),new Vector3(r1.Item2.x, r1.Item2.y, Math.Max(r1.Item2.z,r2.Item2.z))));
+				}
+				else if(newRegionsAdj.Any(b=> r1!=b&&ShareFaceY(r1, b))) {
+					(Vector3, Vector3) r2 = newRegionsAdj.Select(a=>a).Where(b=> r1!=b&&ShareFaceY(r1, b)).First();
+					newRegionsAdj.Remove(r1);
+					newRegionsAdj.Remove(r2);
+					r2last = r2;
+					newRegionsAdj.Add((new Vector3(r1.Item1.x, Math.Min(r1.Item1.y,r2.Item1.y), r1.Item1.z),new Vector3(r1.Item2.x, Math.Max(r1.Item2.y,r2.Item2.y), r1.Item2.z)));
+				}
+				else if(newRegionsAdj.Any(b=> r1!=b&&ShareFaceX(r1, b))) {
+					(Vector3, Vector3) r2 = newRegionsAdj.Select(a=>a).Where(b=> r1!=b&&ShareFaceX(r1, b)).First();
+					newRegionsAdj.Remove(r1);
+					newRegionsAdj.Remove(r2);
+					r2last = r2;
+					newRegionsAdj.Add((new Vector3(Math.Min(r1.Item1.x,r2.Item1.x), r1.Item1.y, r1.Item1.z),new Vector3(Math.Max(r1.Item2.x,r2.Item2.x), r1.Item2.y, r1.Item2.z)));
+				}
+			}
+			return newRegionsAdj;
 		}
 
 		private static bool ShareFaceX((Vector3,Vector3) a, (Vector3,Vector3) b) {
@@ -193,11 +202,14 @@ namespace Advent_of_Code_2021 {
 			//Console.WriteLine(overlaptype);
 			if(turnOn) {
 				if(overlaptype == 0) {
-					// todo
-					// corner overlaps
-					// do as subtract?
+
+					Vector3 maxofmin = new Vector3(Math.Max(area.Item1.x,instruc.Item1.x),Math.Max(area.Item1.y,instruc.Item1.y),Math.Max(area.Item1.z,instruc.Item1.z));
+					Vector3 minofmax = new Vector3(Math.Min(area.Item2.x,instruc.Item2.x),Math.Min(area.Item2.y,instruc.Item2.y),Math.Min(area.Item2.z,instruc.Item2.z));
+					(Vector3,Vector3) mid = (maxofmin,minofmax);
+					var s = Split(instruc,mid,false);
+					newRegions.AddRange(s);
 					newRegions.Add(area);
-					newRegions.Add(instruc);
+
 					return newRegions;
 				}
 				if((overlaptype&7) == 7) { //area fully contains instruction
@@ -210,30 +222,30 @@ namespace Advent_of_Code_2021 {
 				}
 				if((overlaptype&7) == 6) { // instruct sticks out on X
 					newRegions.Add(area);
-					if(area.Item1.x < instruc.Item1.x) { // positive direction
+					if(area.Item2.x < instruc.Item2.x) { // positive direction
 						newRegions.Add((new Vector3(area.Item2.x+1,instruc.Item1.y,instruc.Item1.z),instruc.Item2));
 					}
-					else { // negative direction
+					else if(instruc.Item1.x < area.Item1.x) { // negative direction
 						newRegions.Add((instruc.Item1, new Vector3(area.Item1.x-1,instruc.Item2.y,instruc.Item2.z)));
 					}
 					return newRegions;
 				}
 				if((overlaptype&7) == 5) { // Y
 					newRegions.Add(area);
-					if(area.Item1.y < instruc.Item1.y) {
+					if(area.Item2.y < instruc.Item2.y) {
 						newRegions.Add((new Vector3(instruc.Item1.x,area.Item2.y+1,instruc.Item1.z),instruc.Item2));
 					}
-					else {
+					else if(instruc.Item1.y < area.Item1.y) {
 						newRegions.Add((instruc.Item1, new Vector3(instruc.Item2.x,area.Item1.y-1,instruc.Item2.z)));
 					}
 					return newRegions;
 				}
 				if((overlaptype&7) == 3) { // Z
 					newRegions.Add(area);
-					if(area.Item1.z < instruc.Item1.z) {
+					if(area.Item2.z < instruc.Item2.z) {
 						newRegions.Add((new Vector3(instruc.Item1.x,instruc.Item1.y,area.Item2.z+1),instruc.Item2));
 					}
-					else {
+					else if(instruc.Item1.z < area.Item1.z) { 
 						newRegions.Add((instruc.Item1, new Vector3(instruc.Item2.x,instruc.Item2.y,area.Item1.z-1)));
 					}
 					return newRegions;
@@ -364,57 +376,184 @@ namespace Advent_of_Code_2021 {
 					newRegions.AddRange(Split(mid,instruc,turnOn));
 					return newRegions;
 				}
-				throw new Exception("Some other kind of additive " + overlaptype);
+				Console.WriteLine("Some other kind of additive " + ((overlaptype>>3)&7) + "/" + (overlaptype&7));
 			}
 			else {
 				if(((overlaptype>>3)&7) == 7) { //obliterated
 					return newRegions;
 				}
-				if(((overlaptype>>3)&7) == 6 && (overlaptype&7) == 0) { //truncated on X
+				if(((overlaptype>>3)&7) == 4 || ((overlaptype>>3)&7) == 2 || ((overlaptype>>3)&7) == 1) {
+					(Vector3,Vector3) midx = (new Vector3(instruc.Item1.x,area.Item1.y,area.Item1.z),new Vector3(instruc.Item2.x,area.Item2.y,area.Item2.z));
+					(Vector3,Vector3) midy = (new Vector3(area.Item1.x,instruc.Item1.y,area.Item1.z),new Vector3(area.Item2.x,instruc.Item2.y,area.Item2.z));
+					(Vector3,Vector3) midz = (new Vector3(area.Item1.x,area.Item1.y,instruc.Item1.z),new Vector3(area.Item2.x,area.Item2.y,instruc.Item2.z));
+					
+					newRegions.AddRange(Split(area,midx,false));
+					newRegions.AddRange(Split(area,midy,false));
+					newRegions.AddRange(Split(area,midz,false));
+					
+
+					if(newRegions.Count >= 4) {
+						List<(Vector3,Vector3)> newnewRegions = new List<(Vector3,Vector3)>();
+						newnewRegions.AddRange(Split(newRegions[0],newRegions[2],false));
+						newnewRegions.AddRange(Split(newRegions[1],newRegions[3],false));
+						newnewRegions.AddRange(Split(newRegions[2],newRegions[1],false));
+						newnewRegions.AddRange(Split(newRegions[3],newRegions[0],false));
+
+						return newnewRegions;
+					}
+					else if(newRegions.Count > 2) {
+						var a = ComputeDoesOverlap(newRegions[0], newRegions[1]);
+						var b = ComputeDoesOverlap(newRegions[1], newRegions[2]);
+						var c = ComputeDoesOverlap(newRegions[2], newRegions[0]);
+					}
+					else if(newRegions.Count == 2) {
+						if(ComputeDoesOverlap(newRegions[0], newRegions[1]) >= 0) {
+							var a = newRegions[1];
+							newRegions = Split(newRegions[0], newRegions[1], false);
+							newRegions.Add(a);
+						}
+					}
+					return newRegions;
+				}
+				if((overlaptype&7) == 7 && overlaptype != 55) { //area fully contains instruction
+					Vector3 maxofmin = new Vector3(Math.Max(area.Item1.x,instruc.Item1.x),Math.Max(area.Item1.y,instruc.Item1.y),Math.Max(area.Item1.z,instruc.Item1.z));
+					Vector3 minofmax = new Vector3(Math.Min(area.Item2.x,instruc.Item2.x),Math.Min(area.Item2.y,instruc.Item2.y),Math.Min(area.Item2.z,instruc.Item2.z));
+					
+					if(area.Item1.x < instruc.Item1.x || area.Item2.x > instruc.Item2.x) {
+						if(area.Item1.x < instruc.Item1.x) {
+							newRegions.Add((area.Item1,new Vector3(instruc.Item1.x-1,area.Item2.y,area.Item2.z)));
+						}
+						if(area.Item2.x > instruc.Item2.x) {
+							newRegions.Add((new Vector3(instruc.Item2.x+1,area.Item1.y,area.Item1.z),area.Item2));
+						}
+						newRegions.AddRange(Split((new Vector3(instruc.Item1.x,area.Item1.y,area.Item1.z),new Vector3(instruc.Item2.x,area.Item2.y,area.Item2.z)),instruc,turnOn));
+					}
+					else if(area.Item1.y < instruc.Item1.y || area.Item2.y > instruc.Item2.y) {
+						if(area.Item1.y < instruc.Item1.y) {
+							newRegions.Add((area.Item1,new Vector3(area.Item2.x,instruc.Item1.y-1,area.Item2.z)));
+						}
+						if(area.Item2.y > instruc.Item2.y) {
+							newRegions.Add((new Vector3(area.Item1.x,instruc.Item2.y+1,area.Item1.z),area.Item2));
+						}
+						newRegions.AddRange(Split((new Vector3(area.Item1.x,instruc.Item1.y,area.Item1.z),new Vector3(area.Item1.x,instruc.Item1.y,area.Item1.z)),instruc,turnOn));
+					}
+					else if(area.Item1.z < instruc.Item1.z || area.Item2.z > instruc.Item2.z) {
+						if(area.Item1.z < instruc.Item1.z) {
+							newRegions.Add((area.Item1,new Vector3(area.Item2.x,area.Item2.y,instruc.Item1.z-1)));
+						}
+						if(area.Item2.z > instruc.Item2.z) {
+							newRegions.Add((new Vector3(area.Item1.x,area.Item1.y,instruc.Item2.z+1),area.Item2));
+						}
+						newRegions.AddRange(Split((new Vector3(area.Item1.x,area.Item1.y,instruc.Item1.z),new Vector3(area.Item1.x,area.Item1.y,instruc.Item1.z)),instruc,turnOn));
+					}
+					return newRegions;
+				}
+				if(((overlaptype>>3)&7) == 6 && (overlaptype&1) == 0) { //truncated on X
 					if(area.Item1.x < instruc.Item1.x && area.Item2.x <= instruc.Item2.x)
-						newRegions.Add((area.Item1,new Vector3(instruc.Item1.x,area.Item1.y,area.Item1.z)));
+						newRegions.Add((area.Item1,new Vector3(instruc.Item1.x-1,area.Item2.y,area.Item2.z)));
 					else if(instruc.Item1.x < area.Item1.x && instruc.Item2.x <= area.Item2.x)
-						newRegions.Add((new Vector3(instruc.Item1.x,area.Item2.y,area.Item1.z),area.Item2));
+						newRegions.Add((new Vector3(instruc.Item2.x+1,area.Item1.y,area.Item1.z),area.Item2));
 					else
 						throw new Exception("AAA1");
 					return newRegions;
 				}
-				else {
-					//split in 3
+				else if(((overlaptype>>3)&7) == 6) {
+					// split area into 3 pieces on X, ignoring the middle slice
+					if(area.Item1.x < instruc.Item1.x)
+						newRegions.Add((area.Item1,new Vector3(instruc.Item1.x-1,area.Item2.y,area.Item2.z)));
+					if(area.Item2.x > instruc.Item2.x)
+						newRegions.Add((new Vector3(Math.Min(area.Item2.x, instruc.Item2.x+1),area.Item1.y,area.Item1.z),area.Item2));
+					return newRegions;
 				}
-				if(((overlaptype>>3)&7) == 5 && (overlaptype&7) == 0) { //truncated on Y
+				if(((overlaptype>>3)&7) == 5 && (overlaptype&2) == 0) { //truncated on Y
 					if(area.Item1.y < instruc.Item1.y && area.Item2.y <= instruc.Item2.y)
-						newRegions.Add((area.Item1,new Vector3(area.Item1.x,instruc.Item1.y,area.Item1.z)));
+						newRegions.Add((area.Item1,new Vector3(area.Item2.x,instruc.Item1.y-1,area.Item2.z)));
 					else if(instruc.Item1.y < area.Item1.y && instruc.Item2.y <= area.Item2.y)
-						newRegions.Add((new Vector3(area.Item2.x,instruc.Item1.y,area.Item1.z),area.Item2));
+						newRegions.Add((new Vector3(area.Item1.x,instruc.Item2.y+1,area.Item1.z),area.Item2));
 					else
 						throw new Exception("AAA2");
 					return newRegions;
 				}
-				else {
-					//split in 3
+				else if(((overlaptype>>3)&7) == 5) {
+					// split area into 3 pieces on Y, ignoring the middle slice
+					if(area.Item1.y < instruc.Item1.y)
+						newRegions.Add((area.Item1,new Vector3(area.Item2.x,instruc.Item1.y-1,area.Item2.z)));
+					if(area.Item2.y > instruc.Item2.y)
+						newRegions.Add((new Vector3(area.Item1.x,instruc.Item2.y+1,area.Item1.z),area.Item2));
+					return newRegions;
 				}
-				if(((overlaptype>>3)&7) == 3 && (overlaptype&7) == 0) { //truncated on Z
+				if(((overlaptype>>3)&7) == 3 && (overlaptype&4) == 0) { //truncated on Z
 					if(area.Item1.z < instruc.Item1.z && area.Item2.z <= instruc.Item2.z)
-						newRegions.Add((area.Item1,new Vector3(area.Item1.x,area.Item1.y,instruc.Item1.z)));
+						newRegions.Add((area.Item1,new Vector3(area.Item2.x,area.Item2.y,instruc.Item1.z-1)));
 					else if(instruc.Item1.z < area.Item1.z && instruc.Item2.z <= area.Item2.z)
-						newRegions.Add((new Vector3(area.Item2.x,area.Item1.y,instruc.Item1.z),area.Item2));
+						newRegions.Add((new Vector3(area.Item1.x,area.Item1.y,instruc.Item2.z+1),area.Item2));
 					else
 						throw new Exception("AAA3");
 					return newRegions;
 				}
-				else {
-					//split in 3
+				else if(((overlaptype>>3)&7) == 3) {
+					// split area into 3 pieces on Z, ignoring the middle slice
+					if(area.Item1.z < instruc.Item1.z)
+						newRegions.Add((area.Item1,new Vector3(area.Item2.x,area.Item2.y,instruc.Item1.z-1)));
+					if(area.Item2.z > instruc.Item2.z)
+						newRegions.Add((new Vector3(area.Item1.x,area.Item1.y,instruc.Item2.z+1),area.Item2));
+					return newRegions;
 				}
-				Console.WriteLine("Some other kind of subtractive " + overlaptype);
+				if(((overlaptype>>3)&7) == 0) {
+					(Vector3,Vector3) midx = (new Vector3(instruc.Item1.x,area.Item1.y,area.Item1.z),new Vector3(instruc.Item2.x,area.Item2.y,area.Item2.z));
+					(Vector3,Vector3) topx = (new Vector3(instruc.Item1.x,area.Item1.y,area.Item1.z),new Vector3(   area.Item2.x,area.Item2.y,area.Item2.z));
+					
+					if(area != topx) {
+						newRegions.AddRange(Split(area,midx,false));
+						if(topx.Item1.x<=topx.Item2.x) {
+							(Vector3,Vector3) t = area;
+							foreach((Vector3,Vector3) p in newRegions){
+								t = Split(t,p,false).First();
+							}
+							newRegions.AddRange(Split(t,instruc,false));
+						}
+					}
+					else {
+						(Vector3,Vector3) midy = (new Vector3(area.Item1.x,instruc.Item1.y,area.Item1.z),new Vector3(area.Item2.x,instruc.Item2.y,area.Item2.z));
+						(Vector3,Vector3) topy = (new Vector3(area.Item1.x,instruc.Item1.y,area.Item1.z),new Vector3(area.Item2.x,   area.Item2.y,area.Item2.z));
+						if(area != topy) {
+							newRegions.AddRange(Split(area,midy,false));
+							if(topy.Item1.y<=topy.Item2.y){
+								(Vector3,Vector3) t = area;
+								foreach((Vector3,Vector3) p in newRegions) {
+									t = Split(t,p,false).First();
+								}
+								newRegions.AddRange(Split(t,instruc,false));
+							}
+						}
+						else {
+							(Vector3,Vector3) midz = (new Vector3(area.Item1.x,area.Item1.y,instruc.Item1.z),new Vector3(area.Item2.x,area.Item2.y,instruc.Item2.z));
+							(Vector3,Vector3) topz = (new Vector3(area.Item1.x,area.Item1.y,instruc.Item1.z),new Vector3(area.Item2.x,area.Item2.y,   area.Item2.z));
+							if(area != topz) {
+								newRegions.AddRange(Split(area,midz,false));
+								if(topz.Item1.z<=topz.Item2.z) {
+									(Vector3,Vector3) t = area;
+									foreach((Vector3,Vector3) p in newRegions){
+										t = Split(t,p,false).First();
+									}
+									newRegions.AddRange(Split(t,instruc,false));
+								}
+							}
+							else {
+								;
+							}
+						}
+					}
+					return newRegions;
+				}
 			}
 			return newRegions;
 		}
 
 		private static long GetVolume((Vector3,Vector3) area) {
-			int dx = area.Item2.x-area.Item1.x+1;
-			int dy = area.Item2.y-area.Item1.y+1;
-			int dz = area.Item2.z-area.Item1.z+1;
+			long dx = area.Item2.x-area.Item1.x+1;
+			long dy = area.Item2.y-area.Item1.y+1;
+			long dz = area.Item2.z-area.Item1.z+1;
 			return dx*dy*dz;
 		}
 
@@ -434,42 +573,5 @@ namespace Advent_of_Code_2021 {
 
 			return ret;
 		}
-
-		/*private static long ComputeSubgrid(Grid3D reactor, List<(bool,(int,int,int,int,int,int))> instructions) {
-			(int,int,int,int,int,int) cube;
-			bool turnOn;
-			foreach((bool,(int,int,int,int,int,int)) instruc in instructions) {
-				turnOn = instruc.Item1;
-				cube = instruc.Item2;
-
-				if(cube.Item1 < reactor.MinX && cube.Item2 < reactor.MinX) continue;
-				if(cube.Item3 < reactor.MinY && cube.Item4 < reactor.MinY) continue;
-				if(cube.Item5 < reactor.MinZ && cube.Item6 < reactor.MinZ) continue;
-
-				if(cube.Item1 >= reactor.MaxX && cube.Item2 >= reactor.MaxX) continue;
-				if(cube.Item3 >= reactor.MaxY && cube.Item4 >= reactor.MaxY) continue;
-				if(cube.Item5 >= reactor.MaxZ && cube.Item6 >= reactor.MaxZ) continue;
-
-				for(int x = cube.Item1; x <= cube.Item2; x++) {
-					if(x < reactor.MinX || x >= reactor.MaxX) continue;
-					for(int y = cube.Item3; y <= cube.Item4; y++) {
-						if(y < reactor.MinY || y >= reactor.MaxY) continue;
-						for(int z = cube.Item5; z <= cube.Item6; z++) {
-							if(z < reactor.MinZ || z >= reactor.MaxZ) continue;
-							reactor[x,y,z] = turnOn ? 1 : 0;
-						}
-					}
-				}
-			}
-			long numOn = 0;
-			for(int x = reactor.MinX; x < reactor.MaxX; x++) {
-				for(int y = reactor.MinY; y < reactor.MaxY; y++) {
-					for(int z = reactor.MinZ; z < reactor.MaxZ; z++) {
-						numOn += reactor[x,y,z];
-					}
-				}
-			}
-			return numOn;
-		}*/
 	}
 }
